@@ -1,0 +1,17 @@
+h3{
+	text-transform:uppercase;
+	font-family:Arial;
+	
+	
+}
+p{
+	text-align:right;
+}
+body{
+	background-color:pink;
+	
+}
+a{
+	font-size:16px;
+	font-style:italic;
+}
