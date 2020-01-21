@@ -1,272 +1,139 @@
-var medkit;
-var rapidfire;
-var bullet;
-var spaceship;
-var mx = -100; //medkit x
-var my = 0; //medkit y
-var rx = 0; //rapidfire x
-var ry = 0; //rapidfire y
-var bx = -100; //bullet x
-var by = 600; //bullet y
-var sx = 0; //spaceship x
-var sy = 0; //spaceship y 
-var bulletTrackerRad = 1;
-var SpaceShipSpeed = 10;
-//aidans code
-var meteor =[meteor, meteor, meteor, meteor, meteor, meteor];
-var vert = 0;//vertical 
-var horiz = 0;
-var meteorHeight = 150;
-var meteorWidth = 150;
-var wallBuffer = 300;//distance from the canvas that the meteors bounce off of
-let rad = 50; // Width of the shape
-var buffer = 80;//used to set meteor and tracker at same starting position
-var bulletXBuffer = 13;//used to set the bullet and the tracker at the same position
-var bulletYBuffer = 30;
-let xpos1, ypos1; // Starting position of shape (used for first meteor)
-let xpos2, ypos2;//used for 2nd meteor
-let xpos3, ypos3;//used for 3rd meteor
-let xpos4, ypos4;//used for 4th meteor
-let xpos5, ypos5;//used for 5th meteor
-let xpos6, ypos6;//used for 6th meteor
-let xspeed = 5; // Speed of the shape
-let yspeed = 5; // Speed of the shape
+var bullets; //bullet 
+var meteor; // meteor
+var ship; // ship
+var shipImage, bulletImage, meteorImage; // images for ship,bullet,meteor
+var MARGIN = 40; // help set postions for all sprites
+var lives = 3;
+var score = 0;
+//creates sprite
+function setup() {
+  createCanvas(800, 600);
 
-var xdirection1 = Math.random();//changes bounce direction
-var ydirection1 = Math.random();
-var xdirection2 = Math.random();
-var ydirection2 = Math.random();
-var xdirection3 = Math.random();
-var ydirection3 = Math.random();
-var xdirection4 = Math.random();
-var ydirection4 = Math.random();
-var xdirection5 = Math.random();
-var ydirection5 = Math.random();
-var xdirection6 = Math.random();
-var ydirection6 = Math.random();
+  bulletImage = loadImage('bullet.png');
+  shipImage = loadImage('Newspaceship.png');
+  meteorImage = loadImage('');
 
-function preload(){
-	// load image
-	medkit = loadImage('/health.png');
-	rapidfire = loadImage('/rapidFire.png');
-	bullet = loadImage('/bullet.png');
-	spaceship = loadImage('/Newspaceship.png');
-	//aidans code
-	meteor = loadImage('/Big Meteor.png');
-}
+//creates ship
+  ship = createSprite(width/2, height/2);
+  ship.maxSpeed = 6;
+  ship.friction = 0.98;
+  ship.setCollider('circle', 0, 0, 20);
+
+  ship.addImage('normal', shipImage); //addes the ship image
  
-function setup(){
-	// set canvas size
-	createCanvas(800,700);
-	background('black');
-	rx = width/2;
-	sx = width/2;
-	sy = height/2;
-	//aidans code 
-	noStroke();
-	frameRate(30);
-	ellipseMode(RADIUS);
-	// Set the starting position of the shape
-	xpos1 = -100;
-	ypos1 = -100;
-	xpos2 = 1000;
-	ypos2 = 300;
-	xpos3 = 900;
-	ypos3 = -100;
-	xpos4 = 0;
-	ypos4 = 900;
-	xpos5 = 450;
-	ypos5 = 900;
-	xpos6 = 900;
-	ypos6 = 900;
-}
- 
-function draw(){
-	// Draws power ups and spaceship
-	background(0);
-	image(medkit, mx, my);
-	image(rapidfire, rx, ry);
-	image(bullet, bx, by);
-	image(spaceship, sx, sy);
-	move();
-	//moves spaceship with w,a,s,d
-	if (keyIsDown(87)){ //w
-		sy = sy - SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(83)){ //s
-		sy = sy + SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(65)){ //a
-		sx = sx - SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(68)){ //d
-		sx = sx + SpaceShipSpeed;
-	}
-	//moves spaceship with arrows
-	if (keyIsDown(38)){ //up
-		sy = sy - SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(40)){ //down
-		sy = sy + SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(37)){ //left
-		sx = sx - SpaceShipSpeed;
-	}
-	
-	if (keyIsDown(39)){ //right
-		sx = sx + SpaceShipSpeed;
-	}
-	
-	//aidans code 
-	//wall code for first meteor
-	xpos1 = xpos1 + xspeed * xdirection1;
-	ypos1 = ypos1 + yspeed * ydirection1;
-	if (xpos1> width - rad +wallBuffer|| xpos1 < rad-wallBuffer) {
-		xdirection1 *= -1.01;	
-	}
-	if (ypos1> height - rad +wallBuffer || ypos1 < rad-wallBuffer) {
-		ydirection1 *= -1.01; //cause meteors to slowly speed up	
-	}
-	
-	//wall code for second meteor
-	xpos2 = xpos2 + xspeed * xdirection2;
-	ypos2 = ypos2 + yspeed * ydirection2;
-	if (xpos2> width - rad +wallBuffer|| xpos2< rad-wallBuffer) {
-		xdirection2 *= -1.01;	
-	}
-	if (ypos2> height - rad +wallBuffer || ypos2< rad-wallBuffer) {
-		ydirection2 *= -1.01; //cause meteors to slowly speed up	
-	}
-	
-	//wall code for third meteor
-	xpos3 = xpos3 + xspeed * xdirection3;
-	ypos3 = ypos3 + yspeed * ydirection3;
-	if (xpos3> width - rad +wallBuffer|| xpos3 < rad-wallBuffer) {
-		xdirection3 *= -1.01;	
-	}
-	if (ypos3> height - rad +wallBuffer || ypos3 < rad-wallBuffer) {
-		ydirection3 *= -1.01; //cause meteors to slowly speed up	
-	}
-	
-	//wall code for fourth meteor
-	xpos4 = xpos4 + xspeed * xdirection4;
-	ypos4 = ypos4 + yspeed * ydirection4;
-	if (xpos4> width - rad +wallBuffer|| xpos4 < rad-wallBuffer) {
-		xdirection4 *= -1.01;	
-	}
-	if (ypos4> height - rad +wallBuffer || ypos4 < rad-wallBuffer) {
-		ydirection4 *= -1.01; //cause meteors to slowly speed up	
-	}
-	
-	//wall code for fifth meteor
-	xpos5 = xpos5 + xspeed * xdirection5;
-	ypos5 = ypos5 + yspeed * ydirection5;
-	if (xpos5> width - rad +wallBuffer|| xpos5 < rad-wallBuffer) {
-		xdirection5 *= -1.01;	
-	}
-	if (ypos5> height - rad +wallBuffer || ypos5 < rad-wallBuffer) {
-		ydirection5 *= -1.01; //cause meteors to slowly speed up	
-	}
-	
-	//wall code for sixth meteor
-	xpos6 = xpos6 + xspeed * xdirection6;
-	ypos6 = ypos6 + yspeed * ydirection6;
-	if (xpos6> width - rad +wallBuffer|| xpos6< rad-wallBuffer) {
-		xdirection6 *= -1.01;	
-	}
-	if (ypos6> height - rad +wallBuffer || ypos6< rad-wallBuffer) {
-		ydirection6 *= -1.01; //cause meteors to slowly speed up	
-	}
 
-  // Draw the trackers and meteor images
-	var tracker = [ellipse(xpos1, ypos1, rad, rad),ellipse(xpos2, ypos2, rad, rad),ellipse(xpos3, ypos3, rad, rad),ellipse(xpos4, ypos4, rad, rad),ellipse(xpos5, ypos5, rad, rad),ellipse(xpos6, ypos6, rad, rad)];
-	var bulletTracker = ellipse(bx+bulletXBuffer, by+bulletYBuffer,bulletTrackerRad, bulletTrackerRad)
-	image(meteor, xpos1-buffer, ypos1-buffer, meteorWidth, meteorHeight );
-	//top left meteor
-	image(meteor, xpos2-buffer, ypos2-buffer, meteorWidth, meteorHeight );
-	//top center meteor
-	image(meteor, xpos3-buffer, ypos3-buffer, meteorWidth, meteorHeight );
-	//top right meteor
-	image(meteor, xpos4-buffer, ypos4-buffer, meteorWidth, meteorHeight );
-	//bottom left meteor
-	image(meteor, xpos5-buffer, ypos5-buffer, meteorWidth, meteorHeight );
-	//bottom center meteor
-	image(meteor, xpos6-buffer, ypos6-buffer, meteorWidth, meteorHeight );
-	//bottom right meteor
-	move();
-	
+  meteor = new Group(); //
+  bullets = new Group();
+
+  for(var i = 0; i<8; i++) {
+    var ang = random(360);
+    var px = width/2 + 1000 * cos(radians(ang));
+    var py = height/2+ 1000 * sin(radians(ang));
+    createAsteroid(3, px, py);
+  }
 }
 
+// draws sprites and has they code for when keys are down
+function draw() {
+  background(0);
+  fill(255);
+  textAlign(CENTER);
+  //writes text on canvas
+  text('Controls: Arrow Keys + space', width/2, 20);
+  text('Lives = ' + lives , 50, 20);
+	text('Score = ' + score, 200, 20);
+//when the ship live = 0 it ends the game
+  if(lives === 0){
+	  textSize(70);
+	text('GAME OVER' , width/2, height/2);
+	
+	bullet.remove();
+  }
+//sets postions for all sprites
+  for(var i=0; i<allSprites.length; i++) { //margins called here
+    var s = allSprites[i];
+    if(s.position.x<-MARGIN) s.position.x = width+MARGIN;
+    if(s.position.x>width+MARGIN) s.position.x = -MARGIN;
+    if(s.position.y<-MARGIN) s.position.y = height+MARGIN;
+    if(s.position.y>height+MARGIN) s.position.y = -MARGIN;
+  }
 
-function move(){
-	// Moves power ups and bullet
-	mx = mx + 2;
-	my = my + 0;
-	rx = rx + 2;
-	ry = ry + 0;
-	bx = bx + 0;
-	by = by - 10;
-	
-	//changes medkit x when it gets off screen
-	if(mx > width+100){
-		mx = -100;
-	}
-	
-	//changes rapidfire x when it gets off screen
-	if(rx > width+100){
-		rx = -100;
-	}
-	
-	//changes bullet x and y when it gets off screen
-	if(by < -50){
-		by = 600;
-		bx = -100;
-	}
-	
-	//stops spaceship from going off screen
-	if(sy < 0){
-		sy = 0;
-		sx = sx;
-	}
-	
-	if(sy > height-30){
-		sy = height-30;
-		sx = sx;
-	}
-	
-	if(sx < 0){
-		sy = sy;
-		sx = 0;
-	}
-	
-	if(sx > width-30){
-		sy = sy;
-		sx = width-30;
-	}
-	
-	//when bullet hits power up, move power up x and y
-	if(by === my && bx === mx){
-		mx = -100;
-	}
+// when meteor gets hit by the bullet it calls the meteorHit function
+  meteor.overlap(bullets, meteorHit);
+  
+// when meteor hits ship it calls shipHit function
+  ship.overlap(meteor, shipHit); 
+
+// makes ship bounce when meteor hits it 
+  ship.bounce(meteor);
+
+  if(keyDown(LEFT_ARROW))
+    ship.rotation -= 4;
+  if(keyDown(RIGHT_ARROW))
+    ship.rotation += 4;
+  if(keyDown(UP_ARROW))
+  {
+    ship.addSpeed(100, ship.rotation-90);
+  }
+
+  if(keyWentDown(' '))
+  {
+    var bullet = createSprite(ship.position.x, ship.position.y);
+    bullet.addImage(bulletImage);
+	bullet.rotation = ship.rotation;
+    bullet.setSpeed(10, ship.rotation-90);
+    bullet.life = 30;
+    bullets.add(bullet);
+  }
+
+  drawSprites();
+
 }
 
-function keyPressed(){
-	//shoot bullet
-	if (keyCode === 32){
-		by = sy;
-		bx = sx;
-	}
+//makes the meteors
+function createAsteroid(type, x, y) {
+  var a = createSprite(x, y);
+  var img = loadImage('Newbigmeteor.png');
+  a.addImage(img);
+  a.setSpeed(2.5-(type/2), random(360));
+  a.rotationSpeed = 0.5;
+  a.type = type;
+
+  if(type == 2)
+    a.scale = 0.6;
+  if(type == 1)
+    a.scale = 0.3;
+
+  a.mass = 2+a.scale;
+  a.setCollider('circle', 0, 0, 50);
+  meteor.add(a);
+  return a;
 }
 
-function start(){
-	preload();
-	setup();
-	draw();
-	keyPressed();
+// meteorHit function creates smaller meteors and removes bullet and meteor that was hit
+function meteorHit(meteor, bullet) {
+  score = score + 10;
+  var newType = meteor.type-1;
+
+  if(newType>0) {
+    createAsteroid(newType, meteor.position.x, meteor.position.y);
+    createAsteroid(newType, meteor.position.x, meteor.position.y);
+  }
+
+  for(var i=0; i<10; i++) {
+    var p = createSprite(bullet.position.x, bullet.position.y);
+    p.addImage(meteorImage);
+    p.setSpeed(random(3, 5), random(360));
+    p.friction = 0.95;
+    p.life = 15;
+  }
+
+  bullet.remove();
+  meteor.remove();
 }
-start();
+// shipHit function subtracts lives and chages ship x and y 
+function shipHit(ship, meteor){
+	lives = lives - 1;
+	ship.position.x = width/2;
+	ship.position.y = height/2;
+}
