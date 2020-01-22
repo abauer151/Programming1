@@ -1,10 +1,12 @@
 var bullets; //bullet 
 var meteor; // meteor
 var ship; // ship
+var medkit; // medkit 
 var shipImage, bulletImage, meteorImage; // images for ship,bullet,meteor
 var MARGIN = 40; // help set postions for all sprites
 var lives = 3;
 var score = 0;
+var timerInt = 25000;//meteor spawn timer interval
 //creates sprite
 function setup() {
   createCanvas(800, 600);
@@ -12,6 +14,7 @@ function setup() {
   bulletImage = loadImage('bullet.png');
   shipImage = loadImage('Newspaceship.png');
   meteorImage = loadImage('');
+  medkitImage = loadImage('health.png');
 
 //creates ship
   ship = createSprite(width/2, height/2);
@@ -22,15 +25,26 @@ function setup() {
   ship.addImage('normal', shipImage); //addes the ship image
  
 
-  meteor = new Group(); //
+  meteor = new Group();
   bullets = new Group();
+  medkit = new Group();
 
+// adds the meteor
   for(var i = 0; i<8; i++) {
     var ang = random(360);
     var px = width/2 + 1000 * cos(radians(ang));
     var py = height/2+ 1000 * sin(radians(ang));
     createAsteroid(3, px, py);
   }
+  
+  // adds medkit
+  for(var i = 0; i<3; i++) {
+    var ang = random(360);
+    var px = width/2 + 1000 * cos(radians(ang));
+    var py = height/2+ 1000 * sin(radians(ang));
+    createMedkit(3, px, py);
+  }
+  setInterval(respawn, timerInt);
 }
 
 // draws sprites and has they code for when keys are down
@@ -41,7 +55,7 @@ function draw() {
   //writes text on canvas
   text('Controls: Arrow Keys + space', width/2, 20);
   text('Lives = ' + lives , 50, 20);
-	text('Score = ' + score, 200, 20);
+  text('Score = ' + score, 200, 20);
 //when the ship live = 0 it ends the game
   if(lives === 0){
 	  textSize(70);
@@ -63,17 +77,20 @@ function draw() {
   
 // when meteor hits ship it calls shipHit function
   ship.overlap(meteor, shipHit); 
-
+  
+// when ship hits medkit it calls medkitHit function
+  ship.overlap(medkit, medkitHit);
+ 
 // makes ship bounce when meteor hits it 
   ship.bounce(meteor);
 
   if(keyDown(LEFT_ARROW))
-    ship.rotation -= 4;
+    ship.rotation -= 6;
   if(keyDown(RIGHT_ARROW))
-    ship.rotation += 4;
+    ship.rotation += 6;
   if(keyDown(UP_ARROW))
   {
-    ship.addSpeed(100, ship.rotation-90);
+    ship.addSpeed(200, ship.rotation-90);
   }
 
   if(keyWentDown(' '))
@@ -108,13 +125,31 @@ function createAsteroid(type, x, y) {
   a.setCollider('circle', 0, 0, 50);
   meteor.add(a);
   return a;
+  
+}
+
+// makes medkit
+function createMedkit(type, x, y) {
+  var a = createSprite(x, y);
+  var img = loadImage('health.png');
+  a.addImage(img);
+  a.setSpeed(2.5-(type/2), random(360));
+  a.rotationSpeed = 0.5;
+  a.type = type;
+
+  if(type == 1)
+    a.scale = 1;
+
+  a.mass = 2+a.scale;
+  a.setCollider('circle', 0, 0, 50);
+  medkit.add(a);
+  return a;
 }
 
 // meteorHit function creates smaller meteors and removes bullet and meteor that was hit
 function meteorHit(meteor, bullet) {
   score = score + 10;
   var newType = meteor.type-1;
-
   if(newType>0) {
     createAsteroid(newType, meteor.position.x, meteor.position.y);
     createAsteroid(newType, meteor.position.x, meteor.position.y);
@@ -130,10 +165,25 @@ function meteorHit(meteor, bullet) {
 
   bullet.remove();
   meteor.remove();
+  
+  if(score > 1000)
+	  timerInt = timerInt - 50;
 }
 // shipHit function subtracts lives and chages ship x and y 
 function shipHit(ship, meteor){
 	lives = lives - 1;
 	ship.position.x = width/2;
 	ship.position.y = height/2;
+}
+
+// medkitHit function adds a live and remove the medkit
+function medkitHit(ship, medkit){
+	lives = lives + 1; 
+	medkit.remove();
+}
+function respawn(){
+	createAsteroid(3, 0, 0);
+	createAsteroid(3, 0, height);
+	createAsteroid(3, width, 0);
+	createAsteroid(3, width, height);
 }
